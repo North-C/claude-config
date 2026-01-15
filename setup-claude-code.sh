@@ -15,7 +15,6 @@ SCRIPT_NAME=$(basename "$0")
 NODE_MIN_VERSION=18
 NODE_INSTALL_VERSION=22
 NVM_VERSION="v0.40.3"
-CLAUDE_PACKAGE="@anthropic-ai/claude-code"
 CONFIG_DIR="$HOME/.claude"
 CONFIG_FILE="$CONFIG_DIR/settings.json"
 API_BASE_URL="https://open.bigmodel.cn/api/anthropic"
@@ -142,8 +141,8 @@ install_claude_code() {
     if command -v claude &>/dev/null; then
         log_success "Claude Code is already installed: $(claude --version)"
     else
-        log_info "Installing Claude Code..."
-        npm install -g "$CLAUDE_PACKAGE" || {
+        log_info "Installing Claude Code via official installer..."
+        curl -fsSL https://claude.ai/install.sh | bash || {
             log_error "Failed to install claude-code"
             exit 1
         }
