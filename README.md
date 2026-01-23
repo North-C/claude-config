@@ -60,3 +60,78 @@ claude /plugin install voltagent-infra
 脚本使用智谱 AI 的 API 端点: `https://open.bigmodel.cn/api/anthropic`
 
 API Key 获取地址: https://open.bigmodel.cn/usercenter/proj-mgmt/apikeys
+
+## Zsh 快速切换命令
+
+为了方便在不同 API 提供商之间快速切换，我们提供了 zsh 快速切换工具。
+
+### 安装
+
+将以下内容添加到你的 `~/.zshrc` 文件中:
+
+```bash
+# Claude Code API 快速切换
+source ~/path/to/claude-config/claude-switcher.zsh
+```
+
+> 注意: 请将 `~/path/to/claude-config` 替换为实际的项目路径
+
+然后重新加载配置:
+```bash
+source ~/.zshrc
+```
+
+### 使用方法
+
+**切换到智谱 API:**
+```bash
+# 交互式输入 API Key
+claude-use-zhipu
+
+# 直接提供 API Key
+claude-use-zhipu "your-api-key-here"
+```
+
+**切换到 Anthropic 官方 API:**
+```bash
+# 交互式输入 API Key
+claude-use-official
+
+# 直接提供 API Key
+claude-use-official "your-api-key-here"
+```
+
+**切换到自定义 API:**
+```bash
+# 指定自定义 Base URL 和 API Key
+claude-use-custom "https://api.example.com/v1" "your-api-key"
+```
+
+**查看当前配置:**
+```bash
+claude-api-status
+```
+
+**列出可用的 API 提供商:**
+```bash
+claude-api-list
+```
+
+**查看帮助信息:**
+```bash
+claude-switcher-help
+```
+
+### 特性
+
+- 🔄 快速切换不同 API 提供商
+- 🔑 支持交互式输入或命令行参数提供 API Key
+- 📊 查看当前配置状态
+- 💾 自动保留现有 API Key（如果不提供新的）
+- ⚡ 支持自定义 API 端点
+
+### 注意事项
+
+- 切换 API 后需要重启 Claude Code 才能生效
+- 配置文件位置: `~/.claude/settings.json`
+- 如果不提供 API Key 参数，工具会尝试保留现有的 Key
