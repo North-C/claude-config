@@ -1,7 +1,8 @@
-#!/bin/zsh
+#!/bin/sh
 
 # Claude Code API 快速切换工具
 # 用于在不同的 API 端点之间快速切换
+# 兼容 sh/bash/zsh
 
 # ========================
 #       常量定义
@@ -164,7 +165,13 @@ claude-use-zhipu() {
         if [ -z "$api_key" ]; then
             echo ""
             echo "📌 获取 API Key: https://open.bigmodel.cn/usercenter/proj-mgmt/apikeys"
-            read "api_key?🔑 请输入智谱 API Key (留空跳过): "
+            # 兼容 bash/sh 的 read 语法
+            if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+                read -p "🔑 请输入智谱 API Key (留空跳过): " api_key
+            else
+                printf "🔑 请输入智谱 API Key (留空跳过): "
+                read api_key
+            fi
         else
             echo "📋 找到已保存的 API Key"
         fi
@@ -207,7 +214,12 @@ claude-use-official() {
         if [ -z "$api_key" ]; then
             echo ""
             echo "📌 获取 API Key: https://console.anthropic.com/settings/keys"
-            read "api_key?🔑 请输入 Anthropic API Key (留空跳过): "
+            if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+                read -p "🔑 请输入 Anthropic API Key (留空跳过): " api_key
+            else
+                printf "🔑 请输入 Anthropic API Key (留空跳过): "
+                read api_key
+            fi
         else
             echo "📋 找到已保存的 API Key"
         fi
@@ -259,7 +271,12 @@ claude-use-custom() {
 
     if [ -z "$base_url" ]; then
         echo ""
-        read "base_url?🌐 请输入 API Base URL: "
+        if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+            read -p "🌐 请输入 API Base URL: " base_url
+        else
+            printf "🌐 请输入 API Base URL: "
+            read base_url
+        fi
     fi
 
     if [ -z "$base_url" ]; then
@@ -268,7 +285,7 @@ claude-use-custom() {
     fi
 
     # 使用 URL 作为 provider 标识（去除特殊字符）
-    local provider=$(echo "$base_url" | sed 's/[^a-zA-Z0-9]/_/g')
+    provider=$(echo "$base_url" | sed 's/[^a-zA-Z0-9]/_/g')
 
     if [ -z "$api_key" ]; then
         # 尝试从已保存的 API Keys 中读取
@@ -282,7 +299,12 @@ claude-use-custom() {
         " 2>/dev/null)
 
         if [ -z "$api_key" ]; then
-            read "api_key?🔑 请输入 API Key (留空跳过): "
+            if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+                read -p "🔑 请输入 API Key (留空跳过): " api_key
+            else
+                printf "🔑 请输入 API Key (留空跳过): "
+                read api_key
+            fi
         else
             echo "📋 找到已保存的 API Key"
         fi
@@ -415,10 +437,12 @@ EOF
 #       自动补全
 # ========================
 
-# 为命令添加自动补全
-if [ -n "$ZSH_VERSION" ] && (( $+functions[compdef] )); then
-    # zsh 补全
-    compdef _gnu_generic claude-use-zhipu
-    compdef _gnu_generic claude-use-official
-    compdef _gnu_generic claude-use-custom
+# 为命令添加自动补全 (仅限 zsh)
+if [ -n "$ZSH_VERSION" ]; then
+    if type compdef > /dev/null 2>&1; then
+        # zsh 补全
+        compdef _gnu_generic claude-use-zhipu
+        compdef _gnu_generic claude-use-official
+        compdef _gnu_generic claude-use-custom
+    fi
 fi
