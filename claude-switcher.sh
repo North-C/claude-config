@@ -107,17 +107,65 @@ _get_current_config() {
         }
 
         const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        const baseUrl = content?.env?.ANTHROPIC_BASE_URL || '未设置';
-        const hasKey = content?.env?.ANTHROPIC_AUTH_TOKEN ? '已配置' : '未配置';
-        const currentProvider = content?.claudeSwitcher?.currentProvider || '未设置';
-        const loginMethod = content?.forceLoginMethod || '未限制';
 
-        console.log('当前提供商: ' + currentProvider);
-        console.log('Base URL: ' + baseUrl);
-        console.log('登录方式: ' + loginMethod);
-        console.log('API Key: ' + hasKey);
+        // 提供商识别映射
+        const providers = {
+            'https://open.bigmodel.cn/api/anthropic': { name: '智谱 AI (Zhipu)', key: 'zhipu' },
+            'https://api.anthropic.com': { name: 'Anthropic 官方', key: 'official' },
+        };
 
-        // 显示已保存的 API Keys
+        const env = content.env || {};
+        const baseUrl = env.ANTHROPIC_BASE_URL || '未设置';
+        const authToken = env.ANTHROPIC_AUTH_TOKEN;
+        const timeout = env.API_TIMEOUT_MS || '未设置';
+        const loginMethod = content.forceLoginMethod || null;
+
+        // 根据 Base URL 识别提供商
+        let providerInfo = { name: '未知/自定义', key: 'custom' };
+        if (baseUrl !== '未设置') {
+            for (const [url, info] of Object.entries(providers)) {
+                if (baseUrl === url) {
+                    providerInfo = info;
+                    break;
+                }
+            }
+        }
+
+        // 判断认证方式
+        let authType = '未配置';
+        if (loginMethod === 'claudeai') {
+            authType = 'Claude.ai 账户登录';
+        } else if (authToken) {
+            authType = 'API Key';
+            // 显示脱敏后的 Key
+            const maskedKey = authToken.length > 12
+                ? authToken.substring(0, 8) + '...' + authToken.substring(authToken.length - 4)
+                : '***';
+            console.log('📊 Claude Code API 配置状态');
+            console.log('');
+            console.log('提供商: ' + providerInfo.name);
+            console.log('Base URL: ' + baseUrl);
+            console.log('认证方式: API Key');
+            console.log('API Key: ' + maskedKey);
+            console.log('超时时间: ' + timeout + 'ms');
+        } else if (loginMethod === 'console') {
+            authType = 'Console API Key (未设置)';
+            console.log('📊 Claude Code API 配置状态');
+            console.log('');
+            console.log('提供商: ' + providerInfo.name);
+            console.log('Base URL: ' + baseUrl);
+            console.log('认证方式: Console API Key (未配置)');
+            console.log('超时时间: ' + timeout + 'ms');
+        } else {
+            console.log('📊 Claude Code API 配置状态');
+            console.log('');
+            console.log('提供商: ' + providerInfo.name);
+            console.log('Base URL: ' + baseUrl);
+            console.log('认证方式: 账户登录 (需执行 /login)');
+            console.log('超时时间: ' + timeout + 'ms');
+        }
+
+        // 显示已保存的 API Keys (来自 claudeSwitcher)
         const apiKeys = content?.claudeSwitcher?.apiKeys || {};
         const savedProviders = Object.keys(apiKeys);
         if (savedProviders.length > 0) {
@@ -125,8 +173,10 @@ _get_current_config() {
             console.log('已保存的 API Keys:');
             savedProviders.forEach(provider => {
                 const key = apiKeys[provider];
-                const maskedKey = key.substring(0, 8) + '...' + key.substring(key.length - 4);
-                const isCurrent = provider === currentProvider ? ' (当前)' : '';
+                const maskedKey = key.length > 12
+                    ? key.substring(0, 8) + '...' + key.substring(key.length - 4)
+                    : '***';
+                const isCurrent = key === authToken ? ' (当前使用)' : '';
                 console.log('  ' + provider + ': ' + maskedKey + isCurrent);
             });
         }
