@@ -5,11 +5,11 @@
 ## 脚本说明
 
 ### setup-claude-code.sh
-统一的 Claude Code 安装脚本，支持两种运行模式。
+统一的 Claude Code 安装脚本，支持多种运行模式。
 
 **完整安装模式** (推荐新用户使用):
 ```bash
-bash scripts/setup-claude-code.sh
+bash setup-claude-code.sh
 ```
 
 包括:
@@ -21,12 +21,18 @@ bash scripts/setup-claude-code.sh
 
 **仅安装插件模式** (假设 Claude Code 已安装):
 ```bash
-bash scripts/setup-claude-code.sh --plugins
+bash setup-claude-code.sh --plugins
+```
+
+**同时安装 Hooks**:
+```bash
+bash setup-claude-code.sh --hooks              # 完整安装 + Hooks
+bash setup-claude-code.sh --plugins --hooks    # 仅安装插件 + Hooks
 ```
 
 **显示帮助信息**:
 ```bash
-bash scripts/setup-claude-code.sh --help
+bash setup-claude-code.sh --help
 ```
 
 ## 已配置的插件
@@ -135,3 +141,59 @@ claude-switcher-help
 - 切换 API 后需要重启 Claude Code 才能生效
 - 配置文件位置: `~/.claude/settings.json`
 - 如果不提供 API Key 参数，工具会尝试保留现有的 Key
+
+## Claude Code Hooks
+
+本项目提供了 Hooks 配置脚本，可为 Claude Code 添加智能停止决策、命令日志记录和子智能体循环功能。
+
+### 什么是 Hooks
+
+Hooks 是 Claude Code 生命周期中特定事件触发时自动执行的自定义 shell 命令或 LLM prompt。它们提供确定性控制，确保特定操作总是执行。
+
+### 快速安装
+
+**安装所有 Hooks:**
+```bash
+bash setup-hooks.sh
+```
+
+**选择性安装:**
+```bash
+bash setup-hooks.sh --stop       # 仅安装智能停止决策
+bash setup-hooks.sh --logging    # 仅安装命令日志记录
+bash setup-hooks.sh --subagent   # 仅安装子智能体循环
+```
+
+**或在安装 Claude Code 时同时安装:**
+```bash
+bash setup-claude-code.sh --hooks
+```
+
+### Hooks 功能
+
+| Hook 类型 | 功能 | 说明 |
+|---------|------|------|
+| **智能停止决策** | Stop Hook | 在 Claude 完成响应时，使用 LLM 智能判断是否应该继续工作 |
+| **命令日志记录** | PreToolUse Hook | 记录所有执行的 Bash 命令到 `~/.claude/logs/bash-commands.log` |
+| **子智能体循环** | SubagentStop Hook | 让子智能体持续工作直到任务完全完成 |
+
+### 使用示例
+
+**查看命令日志:**
+```bash
+tail -f ~/.claude/logs/bash-commands.log
+```
+
+**查看当前 Hooks 配置:**
+```bash
+cat ~/.claude/settings.json | jq '.hooks'
+```
+
+### 详细文档
+
+查看完整的 Hooks 使用指南和配置说明:
+```bash
+cat HOOKS.md
+```
+
+或在线查看: [HOOKS.md](./HOOKS.md)

@@ -35,6 +35,9 @@ PLUGINS_TO_INSTALL=(
 # 运行模式: full 或 plugins-only
 MODE="full"
 
+# 是否安装 hooks
+INSTALL_HOOKS=false
+
 # ========================
 #       工具函数
 # ========================
@@ -68,7 +71,14 @@ show_usage() {
 Usage:
   $SCRIPT_NAME              完整安装 (Node.js + Claude Code + API + Marketplace + Plugins)
   $SCRIPT_NAME --plugins    仅安装插件和 Marketplace (假设 Claude Code 已安装)
+  $SCRIPT_NAME --hooks      同时安装 Hooks (智能停止决策、命令日志记录、子智能体循环)
   $SCRIPT_NAME -h, --help   显示此帮助信息
+
+Examples:
+  $SCRIPT_NAME                      # 完整安装
+  $SCRIPT_NAME --plugins            # 仅安装插件
+  $SCRIPT_NAME --hooks              # 完整安装 + Hooks
+  $SCRIPT_NAME --plugins --hooks    # 仅安装插件 + Hooks
 
 EOF
 }
@@ -262,6 +272,36 @@ install_plugins() {
 }
 
 # ========================
+#     Hooks 安装
+# ========================
+
+install_hooks() {
+    log_info "Installing Claude Code Hooks..."
+    echo ""
+
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local hooks_script="$script_dir/setup-hooks.sh"
+
+    if [ ! -f "$hooks_script" ]; then
+        log_error "Hooks script not found: $hooks_script"
+        return 1
+    fi
+
+    if bash "$hooks_script"; then
+        log_success "Hooks installed successfully"
+        echo ""
+        echo "📋 Installed Hooks:"
+        echo "   - Stop Hook (智能停止决策)"
+        echo "   - Logging Hook (命令日志记录)"
+        echo "   - SubagentStop Hook (子智能体循环)"
+        echo ""
+        echo "📖 查看详细文档: cat $script_dir/HOOKS.md"
+    else
+        log_error "Failed to install hooks"
+    fi
+}
+
+# ========================
 #        主流程
 # ========================
 
@@ -271,6 +311,10 @@ main() {
         case $1 in
             --plugins)
                 MODE="plugins-only"
+                shift
+                ;;
+            --hooks)
+                INSTALL_HOOKS=true
                 shift
                 ;;
             -h|--help)
@@ -302,6 +346,12 @@ main() {
         echo ""
         echo "🛒 Marketplace: $MARKETPLACE_REPO"
         echo ""
+
+        # 安装 Hooks（如果指定）
+        if [ "$INSTALL_HOOKS" = true ]; then
+            install_hooks
+        fi
+
         echo "⚠️  Please restart Claude Code to load the new plugins."
     else
         # 完整安装模式
@@ -311,6 +361,11 @@ main() {
         configure_claude
         add_marketplace
         install_plugins
+
+        # 安装 Hooks（如果指定）
+        if [ "$INSTALL_HOOKS" = true ]; then
+            install_hooks
+        fi
 
         echo ""
         log_success "🎉 Installation completed successfully!"
@@ -324,6 +379,11 @@ main() {
         done
         echo ""
         echo "🛒 Marketplace: $MARKETPLACE_REPO"
+
+        if [ "$INSTALL_HOOKS" = true ]; then
+            echo ""
+            echo "🪝 Hooks: Installed (智能停止决策、命令日志记录、子智能体循环)"
+        fi
     fi
 }
 
