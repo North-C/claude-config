@@ -1,0 +1,105 @@
+# Ghostty Config - Keyboard-driven workflow
+
+# === Theme ===
+theme = Catppuccin Mocha
+
+# === Font ===
+font-family = FiraCode Nerd Font
+# Symbol & emoji fallback chain
+font-codepoint-map = U+23FB-U+23FE,U+2665,U+26A1,U+2B58,U+E000-U+E00A,U+E0A0-U+E0A3,U+E0B0-U+E0C8,U+E0CA,U+E0CC-U+E0D4,U+E200-U+E2A9,U+E300-U+E3E3,U+E5FA-U+E6B1,U+EA60-U+EBEB,U+F000-U+F2E0,U+F300-U+F372,U+F400-U+F532,U+F500-U+FD46,U+F0001-U+F1AF0 = Symbols Nerd Font Mono
+font-size = 14
+font-thicken = true
+adjust-cell-height = 35%
+
+# === Window ===
+window-padding-x = 10
+window-padding-y = 8
+window-padding-balance = true
+window-decoration = true
+window-theme = dark
+gtk-tabs-location = bottom
+gtk-wide-tabs = false
+window-save-state = always
+
+# === Background ===
+background-opacity = 0.92
+background-blur-radius = 20
+
+# === Cursor ===
+cursor-style = block
+cursor-style-blink = false
+
+# === Scrolling ===
+scrollback-limit = 100000
+
+# === Selection & Copy ===
+copy-on-select = clipboard
+mouse-hide-while-typing = true
+
+# === URL handling ===
+link-url = true
+
+# === Shell integration ===
+shell-integration = zsh
+
+# === Misc ===
+confirm-close-surface = false
+macos-option-as-alt = true
+unfocused-split-opacity = 0.9
+
+# === Keybindings - Custom additions beyond defaults ===
+# Note: defaults already provide Ctrl+Shift+T/W/D/E/C/V/F, Ctrl+Tab, etc.
+
+# Reload config quickly
+keybind = ctrl+shift+comma=reload_config
+
+# Split pane zoom (maximize/restore current split)
+keybind = ctrl+shift+enter=toggle_split_zoom
+
+# Jump between shell prompts (uses shell integration)
+keybind = ctrl+shift+page_up=jump_to_prompt:-1
+keybind = ctrl+shift+page_down=jump_to_prompt:1
+
+# Navigate between splits (vim-style)
+keybind = alt+h=goto_split:left
+keybind = alt+l=goto_split:right
+keybind = alt+k=goto_split:up
+keybind = alt+j=goto_split:down
+
+# Unbind conflicting defaults
+keybind = ctrl+alt+left=unbind
+keybind = ctrl+alt+right=unbind
+keybind = ctrl+alt+up=unbind
+keybind = ctrl+alt+down=unbind
+
+# Quick tab switching by number
+keybind = alt+1=goto_tab:1
+keybind = alt+2=goto_tab:2
+keybind = alt+3=goto_tab:3
+keybind = alt+4=goto_tab:4
+keybind = alt+5=goto_tab:5
+keybind = alt+6=goto_tab:6
+keybind = alt+7=goto_tab:7
+keybind = alt+8=goto_tab:8
+keybind = alt+9=last_tab
+
+# Toggle readonly mode (prevent accidental input in important panes)
+keybind = ctrl+shift+u=toggle_readonly
+
+# Toggle fullscreen
+keybind = f11=toggle_fullscreen
+
+# Screenshot
+keybind = ctrl+shift+s=write_screen_file:paste,plain
+
+# New window
+keybind = super+n=new_window
+
+# Command palette
+keybind = ctrl+shift+p=toggle_command_palette
+
+# Inspector for debugging
+keybind = ctrl+shift+i=inspector:toggle
+
+# Select all
+keybind = ctrl+shift+a=select_all
