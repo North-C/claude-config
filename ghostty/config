@@ -23,7 +23,7 @@ window-save-state = always
 
 # === Background ===
 background-opacity = 0.92
-background-blur-radius = 20
+background-blur = true
 
 # === Cursor ===
 cursor-style = block
