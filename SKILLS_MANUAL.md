@@ -1,6 +1,6 @@
 # Claude Code Skills 使用手册
 
-> **最后更新**: 2026-03-25
+> **最后更新**: 2026-04-26
 > **已安装 Skills/Plugins 总数**: 9
 
 ---
@@ -44,7 +44,7 @@
 │   ├── ppt-creator        # 演示文稿创建
 │   └── skill-creator      # 创建自定义技能
 ├── skills/
-│   ├── grok-search        # 实时网络搜索
+│   ├── grok-search        # ⚠️ 已弃用，请使用 MCP Server
 │   ├── github-skill-forge # GitHub 仓库转技能
 │   └── find-skills        # 发现/安装技能
 └── ~/.agents/skills/
@@ -111,9 +111,9 @@ Step 9: 人工审核和迭代
 # 输出文件：/home/test/lyq/ai-coding-tools-report-2025-2026.md
 ```
 
-**使用 grok-search 获取实时数据**:
+**使用 grok-search MCP 获取实时数据**（已通过 MCP 集成，自动触发）:
 ```bash
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "Claude Code 2.0 features"
+# grok-search 已作为 MCP Server 集成，Claude 会自动调用 web_search 等工具
 ```
 
 #### 参考文件
@@ -325,102 +325,82 @@ python ~/.claude/plugins/marketplaces/daymade-skills/skill-creator/scripts/init_
 
 ### 4. grok-search
 
+> **⚠️ 已弃用 (Deprecated)**
+> grok-search **Skill** 已不再推荐使用。请改用 **grok-search MCP Server**，它提供了更好的集成体验（自动触发、无需手动调用脚本）。
+> 详见下方 [grok-search MCP 配置](#grok-search-mcp-配置推荐)。
+
 #### 来源
 - **仓库**: https://github.com/Frankieli123/grok-skill
 - **安装方式**: 手动克隆
 
-#### 用途与支持场景
+#### grok-search MCP 配置（推荐）
 
-| 场景 | 描述 |
+grok-search 已作为 MCP Server 集成到 Claude Code 中，无需手动调用脚本。
+
+**安装命令**:
+
+```bash
+claude mcp add grok-search \
+  -s user \
+  -e GROK_API_URL=<your_grok_api_url> \
+  -e GROK_API_KEY=<your_grok_api_key> \
+  -e GROK_MODEL=grok-4.20-reasoning \
+  -e TAVILY_API_KEY=<your_tavily_api_key> \
+  -e TAVILY_API_URL=<your_tavily_api_url> \
+  -- uvx --from "git+https://github.com/GuDaStudio/GrokSearch@grok-with-tavily" grok-search
+```
+
+**参数说明**:
+
+| 参数 | 说明 |
 |------|------|
-| 实时信息 | 版本号、发布日期、更新日志 |
-| API 文档 | SDK 用法、接口说明 |
-| 错误排查 | 错误信息、故障排除 |
-| 技术状态 | 项目/服务/技术当前状态 |
-| 依赖查询 | 包安装命令、依赖项 |
+| `-s user` | 作用域为用户级（所有项目可用） |
+| `GROK_API_URL` | Grok API 端点地址 |
+| `GROK_API_KEY` | Grok API 密钥 |
+| `GROK_MODEL` | 默认使用的模型 |
+| `TAVILY_API_KEY` | Tavily 搜索 API 密钥（用于额外搜索源） |
+| `TAVILY_API_URL` | Tavily API 端点地址 |
 
-#### 核心特性
-
-- **实时搜索**: 通过 Grok API 获取最新信息
-- **JSON 输出**: 结构化 content + sources
-- **多模型支持**: 支持 Grok-4.1 系列模型
-- **2API 兼容**: 兼容 OpenAI 格式的 API 端点
-
-#### 配置
-
-**配置文件**: `~/.claude/skills/grok-search/config.json`
-
-```json
-{
-  "base_url": "https://ai.huan666.de",
-  "api_key": "sk-xxx",
-  "model": "grok-4.1-fast",
-  "timeout_seconds": 60
-}
-```
-
-**环境变量** (可选):
-```bash
-export GROK_BASE_URL="https://ai.huan666.de"
-export GROK_API_KEY="sk-xxx"
-export GROK_MODEL="grok-4.1-fast"
-```
-
-#### 使用方法
+**验证安装**:
 
 ```bash
-# 基本搜索
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "你的查询"
+# 查看 MCP 状态
+claude mcp list
 
-# 指定模型
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "查询" --model grok-4.1-thinking
-
-# 指定配置文件
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "查询" --config /path/to/config.json
+# 查看详细配置
+claude mcp get grok-search
 ```
 
-#### 输出格式
+**MCP 提供的工具**:
 
-```json
-{
-  "ok": true,
-  "query": "搜索查询",
-  "content": "综合答案...",
-  "sources": [
-    {"url": "https://example.com", "title": "来源标题", "snippet": "..."}
-  ],
-  "elapsed_ms": 8836
-}
-```
-
-#### 可用模型
-
-| 模型 | 特点 |
+| 工具 | 功能 |
 |------|------|
-| `grok-4.1-fast` | 快速响应（默认） |
-| `grok-4.1-thinking` | 深度思考 |
-| `grok-4.1-expert` | 专家级 |
-| `grok-4.1-mini` | 轻量版 |
-| `grok-4.20-beta` | Beta 版 |
+| `web_search` | 深度网络搜索 |
+| `web_fetch` | 获取网页完整内容 |
+| `web_map` | 网站结构映射 |
+| `get_config_info` | 查看配置和连接状态 |
+| `switch_model` | 切换默认模型 |
+| `toggle_builtin_tools` | 切换内置搜索工具 |
 
-#### 实例
+**搜索规划工具**（6 阶段流水线）:
 
-```bash
-# 搜索 Claude Code 最新功能
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "Claude Code 2.0 latest features 2025"
-
-# 搜索 GitHub Copilot 更新
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "GitHub Copilot 2025 new features"
-```
+| 阶段 | 工具 | 说明 |
+|------|------|------|
+| 1 | `plan_intent` | 分析搜索意图 |
+| 2 | `plan_complexity` | 评估复杂度（1-3 级） |
+| 3 | `plan_sub_query` | 拆分子查询 |
+| 4 | `plan_search_term` | 定义搜索词 |
+| 5 | `plan_tool_mapping` | 映射工具到子查询 |
+| 6 | `plan_execution` | 定义执行顺序 |
 
 #### 与 deep-research 集成
 
-grok-search 已集成到 deep-research 的 Step 3（证据收集）阶段，用于获取实时信息：
+grok-search MCP 已集成到 deep-research 的 Step 3（证据收集）阶段，用于获取实时信息：
 
 ```
 deep-research Step 3:
 ├── deepresearch 工具（常规搜索）
-└── grok-search（实时搜索）← 已集成
+└── grok-search MCP（实时搜索）← 已集成
 ```
 
 ---
@@ -906,8 +886,10 @@ node ~/.agents/skills/pretty-mermaid/scripts/render.mjs \
 ### 命令速查
 
 ```bash
-# === Grok 搜索 ===
-python ~/.claude/skills/grok-search/scripts/grok_search.py --query "查询"
+# === Grok 搜索 (MCP) ===
+# 已通过 MCP Server 集成，无需手动调用
+claude mcp get grok-search  # 查看配置
+claude mcp list              # 查看 MCP 状态
 
 # === GitHub 技能锻造 ===
 python ~/.claude/skills/github-skill-forge/scripts/forge.py <URL> --output <DIR>
@@ -937,7 +919,7 @@ claude plugin install <name>@<marketplace>
 
 # Skills (手动)
 ~/.claude/skills/
-├── grok-search/
+├── grok-search/          # ⚠️ 已弃用，使用 MCP
 ├── github-skill-forge/
 └── find-skills/
 
@@ -955,7 +937,7 @@ claude plugin install <name>@<marketplace>
 | deep-research | "研究报告"、"竞品分析"、"文献综述" |
 | ppt-creator | "演示文稿"、"PPT"、"slide deck"、"路演" |
 | skill-creator | "创建技能"、"新技能"、"把...变成技能" |
-| grok-search | 实时信息、版本号、最新状态 |
+| grok-search | 实时信息、版本号、最新状态（⚠️ Skill 已弃用，使用 MCP） |
 | github-skill-forge | "把这个 GitHub 项目转成技能" |
 | find-skills | "有没有...的技能"、"帮我找...技能" |
 | using-superpowers | 元技能（自动触发，指导技能使用） |
@@ -980,4 +962,4 @@ npm install -g @marp-team/marp-cli
 ---
 
 *本手册由 Claude Code 生成*
-*最后更新: 2026-03-25*
+*最后更新: 2026-04-26*
