@@ -197,3 +197,58 @@ cat HOOKS.md
 ```
 
 或在线查看: [HOOKS.md](./HOOKS.md)
+
+## Zsh 插件配置
+
+项目中的 `zsh/.zshrc` 配置了以下插件：
+
+| 插件 | 功能 | 快捷操作 |
+|------|------|----------|
+| **zoxide** | 智能目录跳转（替代 cd） | `z foo` 跳到含 foo 的最常用目录 |
+| **fzf** | 模糊搜索文件/目录/历史命令 | `Ctrl+T` 搜文件，`Ctrl+R` 搜历史 |
+| **broot** | 交互式目录树浏览器 | `br` 浏览目录，退出自动 cd |
+
+### 安装
+
+```bash
+# Fedora
+sudo dnf install -y zoxide fzf
+
+# broot（预编译二进制）
+curl -L https://github.com/Canop/broot/releases/latest/download/broot_1.56.2.zip -o /tmp/broot.zip
+unzip -o /tmp/broot.zip -d /tmp/broot-extract
+cp /tmp/broot-extract/x86_64-unknown-linux-gnu/broot ~/.local/bin/broot
+chmod +x ~/.local/bin/broot
+```
+
+首次运行 `broot` 会提示安装 shell 集成，输入 `:install` 确认即可。
+
+### broot 使用指南
+
+#### 启动方式
+
+| 命令 | 说明 |
+|------|------|
+| `br` | 打开当前目录 |
+| `br /path` | 打开指定目录 |
+| `br -f` | 只显示文件夹 |
+| `br -g` | 显示 git 状态 |
+| `br -d` | 显示文件修改日期 |
+| `br --show-root-fs` | 顶部显示磁盘空间 |
+
+#### 界面内操作
+
+| 按键 | 功能 |
+|------|------|
+| 输入文字 | 模糊搜索过滤 |
+| `↑` `↓` | 上下移动 |
+| `Enter` | 打开文件/进入目录 |
+| `Esc` | 退出（`br` 模式下会 cd 到选中目录） |
+| `:q` | 退出 |
+| `:cd` | cd 到选中目录 |
+| `:e` | 用编辑器打开文件 |
+| `:mkdir 名称` | 创建目录 |
+| `:rm` | 删除文件 |
+| `:cp 目标` | 复制 |
+
+完整文档：https://dystroy.org/broot
