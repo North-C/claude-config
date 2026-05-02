@@ -48,6 +48,12 @@ eval "$(starship init zsh)"
 # zoxide (smart cd)
 eval "$(zoxide init zsh)"
 
+# broot (interactive directory browser)
+# 首次运行 broot 会提示安装 shell 集成，确认后 br 命令退出时自动 cd
+if command -v broot &>/dev/null; then
+  [ -f ~/.config/broot/launcher/bash/br ] && source ~/.config/broot/launcher/bash/br
+fi
+
 # --- Aliases ---
 
 # Navigation
