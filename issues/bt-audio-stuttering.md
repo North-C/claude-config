@@ -13,12 +13,11 @@
 
 ## 原因
 
-1. **USB 自动挂起**: btusb 设备默认 autosuspend=2（2 秒后挂起），蓝牙传输频繁中断
-2. **ERTM 模式**: 增强重传模式在某些设备上导致 A2DP 不稳定
+**USB 自动挂起**: btusb 设备默认 autosuspend=2（2 秒后挂起），蓝牙传输频繁中断
 
 ## 解决方法
 
-### 1. 禁用 btusb 自动挂起 + 禁用 ERTM
+### 1. 禁用 btusb 自动挂起
 
 创建 `/etc/modprobe.d/btusb-fix.conf`：
 
@@ -27,8 +26,6 @@ sudo tee /etc/modprobe.d/btusb-fix.conf > /dev/null << 'EOF'
 # Fix MT7921 Bluetooth audio stuttering
 # Disable USB autosuspend for btusb device (13d3:3563)
 options btusb enable_autosuspend=0
-# Disable ERTM for more stable BLE/A2DP connections
-options bluetooth disable_ertm=1
 EOF
 ```
 
@@ -42,13 +39,9 @@ echo on | sudo tee /sys/bus/usb/devices/1-5/power/control
 
 > 注意: `1-5` 是 MT7921 的 USB 路径，可通过 `lsusb -t` 确认 btusb 所在端口。
 
-### 3. 重启生效验证
+### 3. 重启后验证
 
 ```bash
-# 重启后检查
-cat /sys/module/bluetooth/parameters/disable_ertm
-# 应输出: Y
-
 cat /sys/bus/usb/devices/1-5/power/control
 # 应输出: on
 ```
@@ -64,8 +57,18 @@ cat /sys/bus/usb/devices/1-5/power/autosuspend
 pactl list sinks | grep -A5 bluez_output
 ```
 
-## 参考
+## 踩坑记录
 
-- MT7921 蓝牙通过 USB 挂载（`lsusb -t` 可见 `Driver=btusb`）
-- USB autosuspend 默认值 2 秒对持续数据流（音频）不友好
-- ERTM (Enhanced Retransmission Mode) 在部分 MediaTek 芯片上与 A2DP 冲突
+### disable_ertm=1 导致蓝牙完全不可用
+
+**现象**: 添加 `options bluetooth disable_ertm=1` 后重启，blueman 小程序崩溃，`bluetoothctl` 报 "No default controller available"，hci0 消失。
+
+**原因**: 禁用 ERTM 导致 L2CAP socket 参数设置失败：
+```
+L2CAP server failed for Message Notification: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
+L2CAP server failed for Message Access: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
+```
+
+**解决**: 从 `/etc/modprobe.d/btusb-fix.conf` 中移除 `disable_ertm=1`，重启恢复。
+
+**结论**: MT7921 不需要禁用 ERTM，只需要禁用 USB autosuspend 即可修复音频卡顿。
