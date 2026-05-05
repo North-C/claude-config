@@ -5,3 +5,4 @@
 | 文件 | 问题 | 日期 |
 |------|------|------|
 | [npm-global-eacces.md](./npm-global-eacces.md) | npm install -g 权限不足 (EACCES) | 2026-05-02 |
+| [bt-audio-stuttering.md](./bt-audio-stuttering.md) | MT7921 蓝牙音频卡顿/断续 | 2026-05-05 |
