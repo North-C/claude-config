@@ -2,6 +2,16 @@
 
 用于安装和配置 Claude Code 及其插件的脚本。
 
+## Prompt / Spec / Skill 资产库
+
+日常验证有效的 Prompt 与 Agent 行为规范收录在 [prompts/](./prompts/)：
+
+- `prompts/specs/` — 行为规范源文件（沟通、证据检索、本地操作、安全、工具选择、子代理）
+- `prompts/build.sh` — 组装为 `base-rules.md`；`prompts/install.sh` — 一键挂载到 Claude Code（`~/.claude/CLAUDE.md` @-import）与 Codex（`~/.codex/AGENTS.md` 标记块），幂等可重复
+- `prompts/templates/` — 任务级 prompt 模板；`prompts/skills/` — skill 源文件
+
+详见 [prompts/README.md](./prompts/README.md)。
+
 ## 脚本说明
 
 ### setup-claude-code.sh
