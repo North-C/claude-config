@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 out="base-rules.md"
-order=(communication evidence-research local-work safety tools-and-skills subagents)
+order=(communication evidence-research local-work bug-fixing performance-tuning code-convergence safety tools-and-skills subagents)
 
 {
   echo "# Agent 基础行为规范"
