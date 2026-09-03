@@ -36,3 +36,9 @@ description: 一句话说明做什么、什么时候用（触发词写进这里�
 
 - 文件头/目录 README 注明：`来源（自研/URL）· 收录日期 · 验证情况`
 - 修改过的 skill 注明与上游的差异
+
+## 当前收录
+
+| Skill | 来源 | 收录日期 | 验证情况 |
+|---|---|---|---|
+| `project-instruction-governance` | 自研；cloud-native 试点 | 2026-09-03 | 待首次 automation 行为验证；结构验证必须先通过 |

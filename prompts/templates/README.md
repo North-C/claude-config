@@ -13,3 +13,9 @@
 
 - Claude Code：直接粘贴，或存为 `~/.claude/commands/<name>.md` 变成斜杠命令
 - Codex：直接粘贴，或存为 `~/.codex/prompts/<name>.md` 变成自定义 `/name` 命令
+
+## 当前收录
+
+| 模板 | 场景 | 状态 |
+|---|---|---|
+| `project-instruction-governance.md` | 对一个明确授权的只读源仓库进行规则盘点，并向 claude-config 沉淀至多一个资产 | cloud-native 试点 |
